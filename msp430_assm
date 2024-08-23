@@ -1,0 +1,192 @@
+MSP430 ASSM instructio 
+
+Instruction	Description
+
+rrc <dst>			Rotate right through carry.
+rra <dst>			Rotate right arithmetic.
+swpb <dst>			Swap upper / lower bytes.
+sxt <dst>			Sign extend 8 bit value to 16 bit.
+push <dst>			Push value to stack.
+call <dst>			Call a function.
+reti				Return from interrupt.
+mov <src>, <dst>	Copy value from src to dst.
+add <src>, <dst>	dst = dst + src.
+addc <src>, <dst>	dst = dst + src + c.
+subc <src>, <dst>	dst = dst - src.
+sub <src>, <dst>	dst = dst - src + c.
+cmp <src>, <dst>	dst - src (don't store result, but set flags)
+dadd <src>, <dst>	dst = dst + src (BCD mode).
+bit <src>, <dst>	dst & src (don't store result, but set flags)
+bic <src>, <dst>	dst = dst & ~src (clear bits)
+bis <src>, <dst>	dst = dst | src  (set bits)
+xor <src>, <dst>	dst = dst ^ src
+and <src>, <dst>	dst = dst & src
+jne / jnz <address>	Jump if not equal / zero.
+jeq / jz <address>	Jump if equal / zero.
+jnc / jlo <address>	Jump if no carry / lower (unsigned).
+jc / jhs <address>	Jump if carry / higher or same (unsigned).
+jn <address>		Jump if negative flag set.
+jge <address>		Jump if greater than or equal (signed).
+jl <address>		Jump if less (signed).
+jmp <address>		Jump always.
+
+
+
+pseudo instruction
+
+Alias	Actual Instruction	Description
+
+clrc			bic.b #1, SR		Clear carry flag.
+clrn			bic.b #4, SR		Clear negative flag.
+clrz			bic.b #2, SR		Clear zero flag.
+setc			bis.b #1, SR		Set carry flag.
+setn			bis.b #4, SR		Set negative flag.
+setz			bis.b #2, SR		Set zero flag.
+dint			bic.b #8, SR		Disable interrupts.
+eint			bis.b #8, SR		Enable interrupts.
+nop				mov.w #0, r3		No operation.
+ret				mov @SP+, PC		Return from function (opposite of call).
+pop <dst>		mov @SP+, <dst>		Pop from stack (opposite of push).
+clr.x <dst>		mov.w #0, <dst>		Clear destination.
+adc.x <dst>		addc.w #<dst>		Add carry to destination.
+br <dst>		mov <dst>, PC		Branch to destination.
+dadc.x <dst>	dadd.w #0, <dst>	Decimal add carry destination.
+dec.x <dst>		sub.w #1, <dst>		Decrement.
+decd.x <dst>	sub.w #2, <dst>		Decrement by 2.
+inc.x <dst>		add.w #1, <dst>		Increment.
+incd.x <dst>	add.w #2, <dst>		Increment by 2.
+inv.x <dst>		.x #-1, <dst>		Invert.
+rla.x <dst>		add.w <dst>, <dst>	Rotate left arithmetic.
+rlc.x <dst>		addc.w <dst>, <dst>	Rotate left through carry.
+sbc.x <dst>		subc.w #0, <dst>	Subtract borrow from destination.
+tst.x <dst>		cmp.w #0, <dst>		Test if destination is 0.
+
+
+examples
+
+mov.w r8, r9	   (copy register r8 to r9)
+mov.w @r8, r9	   (copy 16 bits from address r8 points to to r9)
+mov.w @r8+, r9	   (copy 16 bits from address r8 points to to r9r8 = r8 + 2)
+mov.b @r8+, r9     (copy 8 bits from address r8 points to r9 r8 = r8 + 1)
+mov.w 0x80(r8), r9 (copy 16 bits from address r8 points to plus 80 to r9. 
+				   So if r8 = 0x200, copy address 0x200 and 0x201 as little endian)
+mov.w &0x200, r9   (copy 16 bits from 0x200 / 0x201 little endian into r9)
+mov.b &0x200, r9   (copy 8 bits from 0x200 to r9)
+mov.b 0x200, r9	   (copy 8 bits from 0x200 to r9)
+mov.w r8, &0x200   (copy 16 bits from r8 to memory address 0x200 / 0x201 little endian)
+mov.w r8, 0x80(r9) (copy 16 bits from r8 to memory address r9 + 0x80 (and r9 + 0x81) little endian)
+mov.w #5, r9	   (copy 5 to r9)
+mov.b #5, r9	   (copy 5 to r9)
+
+
+
+********************************************
+
+ mov.b #0x41, &P1DIR
+ mov.b #0x40, &P1OUT
+
+
+       P1.7 P1.6 P1.5 P1.4 P1.3 P1.2 P1.1 P1.0
+P1DIR    0    1    0    0    0    0    0    1   = 0x41
+P1OUT    0    1    0    0    0    0    0    0   = 0x40
+
+
+*******************************************************
+
+
+
+       P1.7 P1.6 P1.5 P1.4 P1.3 P1.2 P1.1 P1.0
+P1IN     0    0    0    0    0    0    1    0   = 0x02
+
+  mov.b &P1IN, r8
+  
+  *****************************************************
+  
+  
+  
+  blink.asm
+  
+  .msp430
+.include "msp430x2xx.inc"
+
+.org 0xf800
+start:
+  ;; Turn off watchdog timer.
+  mov.w #WDTPW|WDTHOLD, &WDTCTL
+
+  ;; Set P1.0 and P1.6 as outputs.
+  mov.b #0x41, &P1DIR
+
+main:
+  ;; Initial value for LEDs turns on the P1.0 LED and
+  ;; keeps P1.6 turned off.
+  mov.w #0x01, r8
+while_1:
+  ;; Set LEDs to current value of r8 and toggle P1.0 and P1.6.
+  mov.b r8, &P1OUT
+  xor.b #0x41, r8
+
+  ;; Delay by decrementing r9 60000 times.
+  mov.w #60000, r9
+delay_loop:
+  dec r9
+  jnz delay_loop
+
+  ;; Repeat loop.
+  jmp while_1
+
+.org 0xfffe
+  dw start             ; set reset vector to 'init' label
+  
+  *****************************************************
+  
+  
+  timers 
+  
+  ;; Set up Timer A
+  ;; 8,000,000 / 256 = 31250
+  mov.w #256, &TACCR0
+  mov.w #0, &TACCR1
+  mov.w #TASSEL_2|MC_1, &TACTL ; SMCLK, DIV1, COUNT to TACCR0
+  mov.w #0, &TACCTL0
+  mov.w #0, &TACCTL1
+
+  ;; Set up Timer B.
+  ;; 32768 / 8000 = 4.096
+  mov.w #4, &TBCCR0            ; 32768 ticks = 1 second
+  mov.w #TBSSEL_1|MC_1, &TBCTL ; ACLK, DIV1, COUNT to TBCCR0
+  mov.w #CCIE, &TBCCTL0
+  mov.w #0, &TBCCTL1
+  mov.w #0, &TBCCTL2
+
+
+;; 38.768kHz crystal interrupt
+timer_interrupt_b:
+  cmp.w #sound_end, r4
+  jz timer_interrupt_b_skip
+  add.w #1, r12
+  mov.b @r4+, r5
+  mov.w r5, &TACCR1
+timer_interrupt_b_skip:
+  reti
+
+.org 0xfffa
+  dw timer_interrupt_b     ; Timer1_A3 TBCCR0, CCIFG
+.org 0xfffe
+  dw start                 ; Reset
+  
+  
+  
+  *******************************************
+  
+  UART
+  
+  ;; Setup UART (9600 @ 2 MHz)
+  mov.b #UCSSEL_2|UCSWRST, &UCA0CTL1
+  mov.b #0, &UCA0CTL0
+  mov.b #UCBRS_2, &UCA0MCTL
+  mov.b #220, &UCA0BR0
+  mov.b #0, &UCA0BR1
+  bic.b #UCSWRST, &UCA0CTL1
+  
+  
