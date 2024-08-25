@@ -189,4 +189,13 @@ timer_interrupt_b_skip:
   mov.b #0, &UCA0BR1
   bic.b #UCSWRST, &UCA0CTL1
   
+  ;special sections name
+
+  .text     ;used for programm code
+  .data     ;used for initialized non-const objects (global variables)
+  .bss      ;used for initialized objects (global variables)
+  .const    ;used for initialized const objects (string constants, variables declared const)
+  .cinit    ;used for initialize C global variables at startup
+  .stack    ;used for the function call stack
+  .sysmem   ;used for the dynamic memory allocation pool
   
