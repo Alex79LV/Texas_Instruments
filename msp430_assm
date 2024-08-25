@@ -64,19 +64,19 @@ tst.x <dst>		cmp.w #0, <dst>		Test if destination is 0.
 
 examples
 
-mov.w r8, r9	   (copy register r8 to r9)
-mov.w @r8, r9	   (copy 16 bits from address r8 points to to r9)
-mov.w @r8+, r9	   (copy 16 bits from address r8 points to to r9r8 = r8 + 2)
-mov.b @r8+, r9     (copy 8 bits from address r8 points to r9 r8 = r8 + 1)
-mov.w 0x80(r8), r9 (copy 16 bits from address r8 points to plus 80 to r9. 
-				   So if r8 = 0x200, copy address 0x200 and 0x201 as little endian)
-mov.w &0x200, r9   (copy 16 bits from 0x200 / 0x201 little endian into r9)
-mov.b &0x200, r9   (copy 8 bits from 0x200 to r9)
-mov.b 0x200, r9	   (copy 8 bits from 0x200 to r9)
-mov.w r8, &0x200   (copy 16 bits from r8 to memory address 0x200 / 0x201 little endian)
-mov.w r8, 0x80(r9) (copy 16 bits from r8 to memory address r9 + 0x80 (and r9 + 0x81) little endian)
-mov.w #5, r9	   (copy 5 to r9)
-mov.b #5, r9	   (copy 5 to r9)
+mov.w r8, r9	      ;(copy register r8 to r9)
+mov.w @r8, r9	      ;(copy 16 bits from address r8 points to to r9)
+mov.w @r8+, r9	    ;(copy 16 bits from address r8 points to to r9r8 = r8 + 2)
+mov.b @r8+, r9      ;(copy 8 bits from address r8 points to r9 r8 = r8 + 1)
+mov.w 0x80(r8), r9  ;(copy 16 bits from address r8 points to plus 80 to r9. 
+				      ;So if r8 = 0x200, copy address 0x200 and 0x201 as little endian
+mov.w &0x200, r9    ;(copy 16 bits from 0x200 / 0x201 little endian into r9)
+mov.b &0x200, r9    ;(copy 8 bits from 0x200 to r9)
+mov.b 0x200, r9	    ;(copy 8 bits from 0x200 to r9)
+mov.w r8, &0x200    ;(copy 16 bits from r8 to memory address 0x200 / 0x201 little endian)
+mov.w r8, 0x80(r9)  ;(copy 16 bits from r8 to memory address r9 + 0x80 (and r9 + 0x81) little endian)
+mov.w #5, r9	      ;(copy 5 to r9)
+mov.b #5, r9	      ;(copy 5 to r9)
 
 
 
