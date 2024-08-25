@@ -1,0 +1,6 @@
+MSP430FR2355
+16Bit RISC 24MHz
+
+programm 
+FRAM = 32KB+512B  (programm FRAM + information FRAM)
+SRAM = 4096B
