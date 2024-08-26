@@ -199,3 +199,13 @@ timer_interrupt_b_skip:
   .stack    ;used for the function call stack
   .sysmem   ;used for the dynamic memory allocation pool
   
+
+
+  ;***********************  status register  ************************
+
+     15 /  9            8    7     6      5      4      3    2   1   0
+  ** reserved **        V   SCG1  SCG0  OSCoff CPUoff  GIE   N   Z   C 
+
+  SCG1    ;system clock generator1  enable/disable functions in clock system
+  SCG0    ;system clock generator0  enable/disable functions in clock system
+  OSCoff  ;oscillator off. when set, it turns of LFXT1 crystal oscillator
