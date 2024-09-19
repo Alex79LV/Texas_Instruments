@@ -1,0 +1,7 @@
+nop ; the assembler always starts with .text as the current section
+.data
+.word 1
+.text
+add R5,R5
+.data
+.word 2

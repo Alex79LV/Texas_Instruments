@@ -191,7 +191,7 @@ timer_interrupt_b_skip:
   
   ;special sections name
 
-  .text     ;used for programm code  ROM
+  .text     ;used for programm code  ROM  // FLASH
   .data     ;used for initialized non-const objects (global variables) EEPROM
   .bss      ;used for initialized objects (global variables) RAM
   .const    ;used for initialized const objects (string constants, variables declared const)
